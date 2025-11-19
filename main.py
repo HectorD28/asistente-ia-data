@@ -4,13 +4,14 @@ from components.header import render_header
 from components.uploader import render_uploader
 from components.input_area import render_input_area
 from components.visualization import render_visualization
+from components.sidebar import render_sidebar  
 from backend import subir_archivo_openai, crear_asistente, crear_hilo, procesar_mensaje
 
 # 1. Configuración (Debe ser siempre lo primero)
 st.set_page_config(
     page_title="Asistente de Datos IA",
-    page_icon="Pf",
-    layout="centered"
+    page_icon="📊",
+    layout="wide"
 )
 
 # 2. Cargar Estilos
@@ -27,7 +28,8 @@ if "response" not in st.session_state:
 # 4. Renderizar componentes en orden
 def main():
     render_header()
-    
+    render_sidebar()
+
     archivo = render_uploader()
     
     # Si se sube un nuevo archivo, crear asistente e hilo
@@ -41,12 +43,17 @@ def main():
 
     prompt_text, generar_btn = render_input_area()
     
-    if generar_btn and prompt_text and st.session_state.assistant_id:
-        st.session_state.response = procesar_mensaje(
-            st.session_state.thread_id,
-            st.session_state.assistant_id,
-            prompt_text
-        )
+    if generar_btn:
+        if not st.session_state.assistant_id:
+            st.warning("Por favor, sube un archivo antes de generar una visualización.", icon="⚠️")
+        elif not prompt_text:
+            st.warning("Por favor, escribe una consulta para generar la visualización.", icon="✍️")
+        else:
+            st.session_state.response = procesar_mensaje(
+                st.session_state.thread_id,
+                st.session_state.assistant_id,
+                prompt_text
+            )
     
     # Mostrar la respuesta del asistente o la visualización por defecto
     if st.session_state.response:
