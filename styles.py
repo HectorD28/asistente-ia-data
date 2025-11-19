@@ -1,60 +1,12 @@
 import streamlit as st
 
-def load_css():
-    css = """
-    <style>
-    /* Fondo general */
-    .stApp {
-        background-color: #0e1117;
-        color: white;
-    }
-    
-    /* Uploader */
-    div[data-testid="stFileUploader"] section {
-        background-color: #131d2e;
-        border: 1px dashed #3b82f6;
-        border-radius: 10px;
-    }
-    
-    /* Text Area */
-    .stTextArea textarea {
-        background-color: #131d2e;
-        color: white;
-        border: 1px solid #2d3748;
-        border-radius: 8px;
-    }
-    
-    /* Botón Primario (Generar) */
-    div.stButton > button[kind="primary"] {
-        background-color: #2563eb;
-        border: none;
-        color: white;
-        float: right;
-    }
-
-    /* Botones Secundarios */
-    div.stButton > button[kind="secondary"] {
-        background-color: #1e293b;
-        color: white;
-        border: 1px solid #334155;
-        height: 38px;
-    }
-    
-    /* Caja de visualización */
-    .visualization-box {
-        background-color: #0f172a;
-        border: 1px solid #1e293b;
-        border-radius: 12px;
-        padding: 100px 20px;
-        text-align: center;
-        color: #94a3b8;
-    }
-    
-    /* Alineación vertical */
-    div[data-testid="column"] {
-        display: flex;
-        align-items: center;
-    }
-    </style>
+def load_css(file_path):
     """
-    st.markdown(css, unsafe_allow_html=True)
+    Carga un archivo CSS externo y lo inyecta en la app de Streamlit.
+    """
+    try:
+        with open(file_path) as f:
+            css = f.read()
+        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error(f"Archivo CSS no encontrado en la ruta: {file_path}")

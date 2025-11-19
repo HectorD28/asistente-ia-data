@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # 2. Cargar Estilos
-load_css()
+load_css("assets/style.css")
 
 # 3. Inicializar estado de sesión
 if "assistant_id" not in st.session_state:
