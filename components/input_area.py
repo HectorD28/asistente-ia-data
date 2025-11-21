@@ -10,7 +10,7 @@ def render_input_area():
 
     col_spacer, col_btn = st.columns([0.75, 0.25])
     with col_btn:
-        clicked = st.button("Generar ➤", type="primary", use_container_width=True)
+        clicked = st.button("Consultar ➤", type="primary", use_container_width=True)
     
     st.write("") # Espaciador
     

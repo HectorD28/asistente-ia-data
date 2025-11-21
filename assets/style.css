@@ -85,6 +85,14 @@ div[data-testid="stFileUploader"] section {
     border-radius: 10px;
 }
 
+
+/* Estilo para las burbujas de chat */
+div[data-testid="stChatMessageContent"] {
+    background-color: #fefeff; /* Un color de fondo más oscuro pero distinto al principal */
+    padding: 1rem;
+    border-radius: 0.5rem; /* Bordes redondeados para el efecto de burbuja */
+}
+
 /* Texto/Label del uploader */
 div[data-testid="stFileUploader"] label {
     color: #cbd5e1;
