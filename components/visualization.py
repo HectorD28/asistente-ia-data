@@ -6,12 +6,6 @@ def render_visualization():
     with col_title:
         st.subheader("Visualización")
 
-    with col_btn1:
-        st.button("📥 Exportar", type="secondary", use_container_width=True)
-
-    with col_btn2:
-        st.button("Tt Personalizar", type="secondary", use_container_width=True)
-
     # Renderizar el placeholder HTML
     st.markdown("""
         <div class="visualization-box">

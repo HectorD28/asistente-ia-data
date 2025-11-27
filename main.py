@@ -6,6 +6,7 @@ from components.input_area import render_input_area
 from components.visualization import render_visualization
 from components.sidebar import render_sidebar  
 from components.suggestions import render_suggestions
+from utils.report_generator import generar_pdf_bytes
 from backend import subir_archivo_openai, crear_asistente, crear_hilo, procesar_mensaje
 
 # 1. Configuración (Debe ser siempre lo primero)
@@ -25,11 +26,36 @@ if "thread_id" not in st.session_state:
     st.session_state.thread_id = None
 if "response" not in st.session_state:
     st.session_state.response = None
+if "report_queue" not in st.session_state: 
+    st.session_state.report_queue = []
 
 # 4. Renderizar componentes en orden
 def main():
     render_header()
-    render_sidebar()
+    with st.sidebar:
+        render_sidebar() # Tu sidebar original
+        
+        st.divider()
+        st.subheader(f"📄 Reporte ({len(st.session_state.report_queue)} items)")
+        
+        if st.session_state.report_queue:
+            if st.button("🗑️ Limpiar reporte", use_container_width=True):
+                st.session_state.report_queue = []
+                st.rerun()
+            
+            # Botón de Descarga
+            # Generamos el PDF al vuelo
+            pdf_data = generar_pdf_bytes(st.session_state.report_queue)
+            st.download_button(
+                label="📥 Descargar PDF",
+                data=pdf_data,
+                file_name="reporte_data_insight.pdf",
+                mime="application/pdf",
+                type="primary",
+                use_container_width=True
+            )
+        else:
+            st.info("Agrega análisis para exportar.")
 
     archivo = render_uploader()
     
@@ -46,19 +72,36 @@ def main():
     if "current_suggestions" not in st.session_state:
         st.session_state.current_suggestions = []
 
-    # Mostrar respuesta anterior si existe
+    # --- LÓGICA DE VISUALIZACIÓN Y "AGREGAR AL REPORTE" ---
     if st.session_state.response:
         st.subheader("Respuesta del Asistente")
         
-        # Mostrar texto
-        st.write(st.session_state.response["text"])
+        # Creamos columnas: Contenido (80%) | Acciones (20%)
+        col_content, col_actions = st.columns([0.85, 0.15])
         
-        # Mostrar imágenes
-        if st.session_state.response["images"]:
-            for img in st.session_state.response["images"]:
-                st.image(img)
+        with col_content:
+            st.write(st.session_state.response["text"])
+            if st.session_state.response["images"]:
+                for img in st.session_state.response["images"]:
+                    st.image(img)
         
-        # Guardar las sugerencias recibidas en el estado
+        with col_actions:
+            # Botón para añadir este análisis específico al reporte
+            # Usamos un key único basado en la longitud del historial para evitar duplicados
+            btn_key = f"add_btn_{len(st.session_state.report_queue)}"
+            
+            if st.button("➕ Incluir en Reporte", key="add_to_report", help="Guardar este análisis para el PDF final"):
+                # Guardamos el estado actual en la cola
+                item = {
+                    "text": st.session_state.response["text"],
+                    "images": st.session_state.response["images"],
+                    # Podrías guardar también el prompt si lo tienes disponible en el estado
+                    "query": "Análisis Generado" 
+                }
+                st.session_state.report_queue.append(item)
+                st.toast("✅ Agregado al reporte", icon="📄")
+                st.rerun()
+
         st.session_state.current_suggestions = st.session_state.response.get("suggestions", [])
 
     else:
